@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -22,6 +22,7 @@ public class Mouse : MonoBehaviour {
 					personObject.GetComponent<CircleCollider2D> ().radius = .01f;
 					Invoke ("PickedUpBuffer", .1f);
 					personObject = col.gameObject;
+                    //do the isvalid method here
 					person.hover = true;
 				}
 			}
