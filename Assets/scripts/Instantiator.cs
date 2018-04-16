@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using System;
 using UnityEngine;
@@ -12,16 +12,20 @@ public class Instantiator : MonoBehaviour
     private int HexRow = 76; // how many rows there are (basically the max y value)
     private int countryNumber = 1;
     public int countryCount = 1;
+    public int countrySubtraction = 0;
     GameObject hexagon; // a gameobject we use for instantiation as well as Landmaster()
     public float x; //the coordinates in the gameworld that each hexagon will be instantiated at on runtime
     public float y;
     public int totalHexes = 0; // the total hexagons that have been turned into land. Needs to be here because it is changed by a method in hexagon
     public bool countryExists;
-    private int maxCountries = 250;
-    public GameObject[] countries;
+    static int maxCountries = 500;
+    public List<GameObject> countries;
+    public List<Country> countryscripts;
+    public GameObject[] countries1;
 
     void Start()
-    { //everything between here and when it calls Landmaster() is creating the grid itself.
+    { //everything between here and when it calls Landmaster() is creating the grid itself
+        GameObject master = GameObject.Find("Master");
         x = this.transform.position.x;
         y = this.transform.position.y;
         for (int i = 0; i <= HexColumn; i++)
@@ -38,14 +42,17 @@ public class Instantiator : MonoBehaviour
             HexPosY++;
             y += .38f;
         }
-        for (int l = 0; l <= maxCountries; l++){
-            GameObject country = (GameObject)Instantiate(Resources.Load("Country"), new Vector3(0 , 0 , 0), Quaternion.identity);
+        for (int l = 0; l <= maxCountries; l++)
+        {
+            GameObject country = (GameObject)Instantiate(Resources.Load("Country"), new Vector3(0, 0, 0), Quaternion.identity);
+            country.transform.SetParent(master.transform);
+
+            countries.Add(country);
+            countryscripts.Add(country.GetComponent<Country>());
             countryCount++;
         }
-        countries = GameObject.FindGameObjectsWithTag("country");
-        LandMaster(); // changes some hexagons to land, generates the random map each time.
+        LandMaster(); // changes some hexagocountryscriptsns to land, generates the random map each time.
         Invoke("CountryMaster", 1);
-
     }
     public void LandMaster()
     {
@@ -228,6 +235,7 @@ public class Instantiator : MonoBehaviour
 
     public void CountryMaster()
     {
+        countryNumber = 1;
         HexPosY = 0;
         for (int i = 0; i <= HexColumn; i++)
         {
@@ -235,7 +243,7 @@ public class Instantiator : MonoBehaviour
 
             for (int j = 0; j <= HexRow; j++)
             {
-                GameObject country = GameObject.Find("country " + countryNumber);
+                GameObject country = GameObject.Find("Country " + countryNumber);
                 countryExists = false;
                 hexagon = GameObject.Find("Hexagon " + HexPosX + " , " + HexPosY);
                 hex = hexagon.GetComponent<Hexagon>();
@@ -265,17 +273,16 @@ public class Instantiator : MonoBehaviour
                         hex.isCountry = true;
                         hexagon.transform.SetParent(country.transform);
                         countryNumber++;
-                        print("New country at " + HexPosX + " , " + HexPosY);
                     }
                 }
     HexPosX++;
     }
     HexPosY++;
   }
-  
-  for (int i = 0; i>=HexColumn; i++) {
+        HexPosY = 0;
+  for (int i = 0; i<=HexColumn; i++) {
     HexPosX = 0;
-    for(int j = 0; j>=HexRow; j++) {
+    for(int j = 0; j<=HexRow; j++) {
         hexagon = GameObject.Find("Hexagon " + HexPosX + " , " + HexPosY);
         hex = hexagon.GetComponent<Hexagon>();
         foreach(GameObject c in hex.adj){
@@ -286,16 +293,23 @@ public class Instantiator : MonoBehaviour
                         continue;
                     }
           if (chex.nationNum == hex.nationNum && c.transform.parent != hexagon.transform.parent){
-                        Hexagon[] countryFixer = c.GetComponentsInChildren<Hexagon>();
+                        Hexagon[] countryFixer = c.transform.parent.GetComponentsInChildren<Hexagon>();
                     foreach (Hexagon p in countryFixer){
                             p.transform.parent = hexagon.transform.parent;
                             print("fixed!");
             }
         }
       }
+                HexPosX++;
     }
-            print("second sweep complete");
+            HexPosY++;
+            print("Row " + i + "complete");
   }
-        print(countryNumber);
+        print("second sweep complete");
+        foreach (Country c in countryscripts){
+            c.CreateArray();
+            c.DeleteIfEmpty();
+        }
+        print(countries.Count - countrySubtraction);
 }
 }
