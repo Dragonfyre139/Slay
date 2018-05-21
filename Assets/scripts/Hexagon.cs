@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 public class Hexagon : MonoBehaviour {
@@ -11,9 +11,11 @@ public class Hexagon : MonoBehaviour {
     public bool isCountry = false;
 	private Sprite[] spriteArray;
     public GameObject[] adj = new GameObject[6];
+    public int guardedBy = 0;
+    public bool hasGuard;
 
 	void Awake () {
-		spriteArray = Resources.LoadAll<Sprite>("sprites");
+		spriteArray = Resources.LoadAll<Sprite>("Hexes");
 		instantiator = GameObject.FindObjectOfType<Instantiator> ();
 		HexPosX = instantiator.HexPosX;
 		HexPosY = instantiator.HexPosY;
@@ -27,7 +29,7 @@ public class Hexagon : MonoBehaviour {
 
             adj[0] = GameObject.Find("Hexagon " + HexPosX + " , " + (HexPosY + 1));
             adj[3] = GameObject.Find("Hexagon " + HexPosX + " , " + (HexPosY - 1));
-             if (HexPosX % 2 == 0)
+        if (HexPosX % 2 == 0)
         {
             adj[1] = GameObject.Find("Hexagon " + (HexPosX + 1) + " , " + HexPosY);
             adj[2] = GameObject.Find("Hexagon " + (HexPosX + 1) + " , " + (HexPosY - 1));
@@ -49,4 +51,7 @@ public class Hexagon : MonoBehaviour {
 		this.GetComponent<SpriteRenderer> ().sprite = spriteArray [nationNum];
 		instantiator.totalHexes++;
 }
+    public void ChangeSprite(int a){
+        this.GetComponent<SpriteRenderer>().sprite = spriteArray[a];
+    }
 }
