@@ -4,24 +4,24 @@ using System;
 using UnityEngine;
 public class Instantiator : MonoBehaviour
 {
-    public Hexagon hex; //our link to the hexagon script
-    public Hexagon chex;
+    private Hexagon hex; //our link to the hexagon script
+    private Hexagon chex;
     public int HexPosX = 0;//the inital x position of the instantiator on the hexagon grid
     public int HexPosY = 0;//the inital y position of the instantiator on the hexagon grid
     private int HexColumn = 50; // how many columns there are (basically the max x value)
     private int HexRow = 76; // how many rows there are (basically the max y value)
     private int countryNumber = 1;
     public int countryCount = 1;
-    public int countrySubtraction = 0;
-    GameObject hexagon; // a gameobject we use for instantiation as well as Landmaster()
-    public float x; //the coordinates in the gameworld that each hexagon will be instantiated at on runtime
-    public float y;
+    private GameObject hexagon; // a gameobject we use for instantiation as well as Landmaster()
+    private float x; //the coordinates in the gameworld that each hexagon will be instantiated at on runtime
+    private float y;
     public int totalHexes = 0; // the total hexagons that have been turned into land. Needs to be here because it is changed by a method in hexagon
-    public bool countryExists;
-    static int maxCountries = 500;
+    private bool countryExists;
+    private int maxCountries = 500;
     public List<GameObject> countries;
     public List<Country> countryscripts;
-    public GameObject[] countries1;
+    private GameObject[] countries1;
+    public GameObject nonHexFolder;
 
     void Start()
     { //everything between here and when it calls Landmaster() is creating the grid itself
@@ -130,13 +130,13 @@ public class Instantiator : MonoBehaviour
                         b = UnityEngine.Random.Range(0, 2);
                         break;
                     case 1:
-                        b = UnityEngine.Random.Range(1, 4);
+                        b = UnityEngine.Random.Range(2, 4);
                         break;
                     case 2:
                         b = UnityEngine.Random.Range(0, 4);
                         break;
                     case 3:
-                        b = UnityEngine.Random.Range(3, 6);
+                        b = UnityEngine.Random.Range(3, 5);
                         break;
                     case 4:
                         b = UnityEngine.Random.Range(0, 2);
@@ -296,20 +296,27 @@ public class Instantiator : MonoBehaviour
                         Hexagon[] countryFixer = c.transform.parent.GetComponentsInChildren<Hexagon>();
                     foreach (Hexagon p in countryFixer){
                             p.transform.parent = hexagon.transform.parent;
-                            print("fixed!");
+
             }
         }
       }
                 HexPosX++;
     }
             HexPosY++;
-            print("Row " + i + "complete");
+           
   }
-        print("second sweep complete");
+
         foreach (Country c in countryscripts){
-            c.CreateArray();
+            c.UpdateArray();
             c.DeleteIfEmpty();
+            c.AssignBeginningFood();
         }
-        print(countries.Count - countrySubtraction);
+        GameObject[] allHexes = GameObject.FindGameObjectsWithTag("hex");
+        foreach (GameObject g in allHexes)
+        {
+            if (g.GetComponent<Hexagon>().isCountry == false){
+                g.transform.SetParent(nonHexFolder.transform);
+            }
+        }
 }
 }
