@@ -118,3 +118,4 @@ public class Person : MonoBehaviour
         tier += 1;
     }
 }
+ 
